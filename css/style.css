@@ -195,10 +195,9 @@ nav ul li a:hover{
 }
 
 .hero h1 span{
-    display:inline-block;
-    background:linear-gradient(135deg,#0F172A,#1E3A8A,#1E40AF);
-    background-clip:text;
+    background:linear-gradient(135deg,#60A5FA,#3B82F6,#2563EB);
     -webkit-background-clip:text;
+    background-clip:text;
     -webkit-text-fill-color:transparent;
 }
 .hero p{
@@ -781,4 +780,35 @@ body.auth-body{
     margin-bottom:18px;
     color:#64748B;
     font-size:13px;
+}
+.forgot-password{
+    text-align:right;
+    margin:10px 0 20px;
+}
+
+.forgot-password a{
+    text-decoration:none;
+    color:#3b82f6;
+    font-size:14px;
+}
+
+.forgot-password a:hover{
+    text-decoration:underline;
+}
+.success{
+    background:#ecfdf5;
+    color:#166534;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.error{
+    background:#fef2f2;
+    color:#b91c1c;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:20px;
+    text-align:center;
 }
