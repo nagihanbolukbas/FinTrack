@@ -1,23 +1,28 @@
 <?php
 session_start();
+
 require_once "config/database.php";
+
+require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+
+$mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $first_name = trim($_POST["first_name"]);
-    $last_name = trim($_POST["last_name"]);
-    $email = trim($_POST["email"]);
-    $password = $_POST["password"];
-    $confirm_password = $_POST["confirm_password"];
+    $last_name  = trim($_POST["last_name"]);
+    $email      = trim($_POST["email"]);
+    $password   = $_POST["password"];
 
     if (
         empty($first_name) ||
         empty($last_name) ||
         empty($email) ||
-        empty($password) ||
-        empty($confirm_password)
+        empty($password)
     ) {
 
         $error = "Lütfen tüm alanları doldurun.";
@@ -25,10 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
         $error = "Geçerli bir e-posta adresi giriniz.";
-
-    } elseif ($password !== $confirm_password) {
-
-        $error = "Şifreler eşleşmiyor.";
 
     } elseif (strlen($password) < 6) {
 
@@ -49,7 +50,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $verificationCode = rand(100000,999999);
 
-            $verificationExpiry = date("Y-m-d H:i:s",strtotime("+10 minutes"));
+            $verificationExpiry = date(
+                "Y-m-d H:i:s",
+                strtotime("+10 minutes")
+            );
 
             $insert = $pdo->prepare("
                 INSERT INTO users
@@ -62,8 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     verification_expiry,
                     is_verified
                 )
-                VALUES
-                (?,?,?,?,?,?,0)
+                VALUES (?,?,?,?,?,?,0)
             ");
 
             $insert->execute([
@@ -75,10 +78,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $verificationExpiry
             ]);
 
-         $_SESSION["success"] = "Hesabınız başarıyla oluşturuldu. Giriş yapabilirsiniz.";
+            try{
 
-header("Location: login.php");
-exit;
+                $mail->isSMTP();
+                $mail->Host = "smtp.gmail.com";
+                $mail->SMTPAuth = true;
+
+                // KENDİ GMAIL ADRESİNİ YAZ
+                $mail->Username = "fintrackproject101@gmail.com";
+
+                // GOOGLE APP PASSWORD
+                $mail->Password = "x q g m t g p g o r j k l q m n";
+
+                $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                $mail->CharSet = "UTF-8";
+
+                $mail->setFrom(
+                    "mailadresiniz@gmail.com",
+                    "FinTrack"
+                );
+
+                $mail->addAddress($email);
+
+                $mail->isHTML(true);
+
+                $mail->Subject = "FinTrack E-Posta Doğrulama";
+
+                $mail->Body = "
+                <h2>FinTrack</h2>
+
+                <p>Merhaba <b>$first_name</b>,</p>
+
+                <p>Doğrulama kodunuz:</p>
+
+                <h1 style='color:#2563EB'>
+                    $verificationCode
+                </h1>
+
+                <p>Bu kod 10 dakika geçerlidir.</p>
+                ";
+
+                $mail->send();
+
+                $_SESSION["verify_email"] = $email;
+
+                header("Location: verify.php");
+                exit;
+
+            }catch(Exception $e){
+
+                $error = "E-posta gönderilemedi: ".$mail->ErrorInfo;
+
+            }
+
         }
 
     }
@@ -181,25 +235,21 @@ exit;
 
                 </div>
 
-                <div class="input-group">
+             <div class="input-group">
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Şifre"
-                        required>
+    <input
+        type="password"
+        name="password"
+        placeholder="Şifre"
+        required>
 
-                </div>
+</div>
 
-                <div class="input-group">
+<small class="password-info">
+    Şifre en az <strong>6 karakter</strong> olmalıdır.
+</small>
 
-                    <input
-                        type="password"
-                        name="confirm_password"
-                        placeholder="Şifre Tekrar"
-                        required>
-
-                </div>
+             
 
                 <button class="auth-btn">
 

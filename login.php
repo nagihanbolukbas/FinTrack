@@ -4,6 +4,7 @@ session_start();
 require_once "config/database.php";
 
 $error = "";
+$redirect = false;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -19,29 +20,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $query = $pdo->prepare("SELECT * FROM users WHERE email=?");
         $query->execute([$email]);
 
-        if ($query->rowCount() == 0) {
+       if ($query->rowCount() == 0) {
 
-            $error = "E-posta veya şifre hatalı.";
+    $error = "Bu e-posta adresiyle kayıtlı bir hesap bulunmamaktadır. 3 saniye içinde kayıt sayfasına yönlendirileceksiniz.";
+    $redirect = true;
 
-        } else {
+} else {
 
             $user = $query->fetch(PDO::FETCH_ASSOC);
 
-            if (password_verify($password, $user["password"])) {
+ if (password_verify($password, $user["password"])) {
 
-    $_SESSION["id"] = $user["id"];
-    $_SESSION["first_name"] = $user["first_name"];
-    $_SESSION["last_name"] = $user["last_name"];
-    $_SESSION["email"] = $user["email"];
+    if($user["is_verified"] == 0){
 
-    header("Location: dashboard.php");
-    exit;
+        $error = "Lütfen önce e-posta adresinizi doğrulayın.";
+
+    } else {
+
+        $_SESSION["id"] = $user["id"];
+        $_SESSION["first_name"] = $user["first_name"];
+        $_SESSION["last_name"] = $user["last_name"];
+        $_SESSION["email"] = $user["email"];
+
+        header("Location: dashboard.php");
+        exit;
+
+    }
 
 } else {
 
     $error = "E-posta veya şifre hatalı.";
 
-}
+} 
 
          
 
@@ -142,6 +152,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </button>
 
             </form>
+            <div class="forgot-password">
+    <a href="forgot-password.php">Şifremi Unuttum</a>
+</div>
 
             <div class="auth-footer">
 
@@ -160,6 +173,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
 </div>
+<?php if($redirect){ ?>
+
+<script>
+setTimeout(function () {
+    window.location.href = "register.php";
+}, 3000);
+</script>
+
+<?php } ?>
 
 </body>
 
