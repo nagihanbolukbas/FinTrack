@@ -71,7 +71,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
 type="text"
 name="code"
 maxlength="6"
-placeholder="6 Haneli Kod"
+placeholder="6 Haneli Kod..."
 required>
 </div>
 
