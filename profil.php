@@ -27,6 +27,16 @@ $stmt->execute([$_SESSION["id"]]);
 $totalExpense=$stmt->fetch()["total"];
 
 $balance=$totalIncome-$totalExpense;
+
+$stmt=$pdo->prepare("
+SELECT COUNT(*)
+FROM goals
+WHERE user_id=?
+");
+
+$stmt->execute([$_SESSION["id"]]);
+
+$goalCount=$stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -81,6 +91,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         <h4>Soyad</h4>
         <span><?= htmlspecialchars($user["last_name"]) ?></span>
     </div>
+    
 
     <div class="info-box">
         <i class="fa-solid fa-envelope"></i>
@@ -93,6 +104,58 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         <h4>Kayıt Tarihi</h4>
         <span><?= date("d.m.Y", strtotime($user["created_at"])) ?></span>
     </div>
+
+</div>
+<div class="profile-summary">
+
+<h3>
+<i class="fa-solid fa-chart-line"></i>
+Hesap Özeti
+</h3>
+
+<div class="stats-grid">
+
+<div class="stat-box">
+
+<span>Toplam Gelir</span>
+
+<h2>
+₺<?= number_format($totalIncome,2,",",".") ?>
+</h2>
+
+</div>
+
+<div class="stat-box">
+
+<span>Toplam Gider</span>
+
+<h2>
+₺<?= number_format($totalExpense,2,",",".") ?>
+</h2>
+
+</div>
+
+<div class="stat-box">
+
+<span>Mevcut Bakiye</span>
+
+<h2>
+₺<?= number_format($balance,2,",",".") ?>
+</h2>
+
+</div>
+
+<div class="stat-box">
+
+<span>Hedef Sayısı</span>
+
+<h2>
+<?= $goalCount ?>
+</h2>
+
+</div>
+
+</div>
 
 </div>
 
