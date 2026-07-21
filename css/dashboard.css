@@ -124,6 +124,8 @@ header h2{
 }
 
 .card{
+    position:relative;
+    overflow:hidden;
     padding:30px;
     border-radius:22px;
     color:#fff;
@@ -186,26 +188,6 @@ header h2{
 
 .auth-btn:hover{
     background:#1D4ED8;
-}
-
-/* =========================
-   TABLE
-========================= */
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-table th{
-    text-align:left;
-    padding:16px;
-    background:#F1F5F9;
-}
-
-table td{
-    padding:16px;
-    border-bottom:1px solid #E2E8F0;
 }
 
 /* =========================
@@ -322,14 +304,7 @@ table td{
     padding: 16px;
     border-bottom: 1px solid #E2E8F0;
 }
-.status-income{
-    color: #16A34A;
-    font-weight: 700;
-}
-.status-expense{
-    color: #DC2626;
-    font-weight: 700;    
-}/* =========================
+/* =========================
    PROFIL
 ========================= */
 
@@ -1040,33 +1015,162 @@ color:#0F172A;
     color:#0F172A;
 
 }
-   .btn-profile {
-            background: #2563EB; color: black; padding: 10px 25px; border-radius: 12px; font-weight: 700;
-            text-decoration: none; transition: 0.3s;
-        }
-        .card{
-    position: relative;
-    overflow: hidden;
+.btn-profile{
+    background:#2563EB;
+    color:#fff;
+    padding:10px 25px;
+    border-radius:12px;
+    font-weight:700;
+    text-decoration:none;
+    transition:.3s;
 }
 
+.btn-profile:hover{
+    background:#1D4ED8;
+}
+
+
 .card-rotate{
-    position: absolute !important;
-    top: 18px;
-    right: 18px;
-    left: auto !important;
-    bottom: auto !important;
+    position:absolute;
+    top:18px;
+    right:18px;
+    width:38px;
+    height:38px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:50%;
+    background:rgba(255,255,255,.18);
+    color:#fff;
+    font-size:18px;
+    cursor:pointer;
+}
+/* Dashboard kutuları */
 
-    width: 38px;
-    height: 38px;
+.dashboard-box{
+    background:#fff;
+    border-radius:18px;
+    padding:25px;
+    margin-top:25px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.dashboard-box h3{
+    margin-bottom:20px;
+    color:#1f2937;
+    font-size:24px;
+}
 
-    border-radius: 50%;
-    background: rgba(255,255,255,.18);
+.summary-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
 
-    color: #fff;
-    font-size: 18px;
-    z-index: 100;
+.summary-grid div{
+    background:#f8fafc;
+    border-radius:14px;
+    padding:18px;
+    text-align:center;
+}
+
+.summary-grid span{
+    display:block;
+    color:#64748b;
+    font-size:15px;
+    margin-bottom:8px;
+}
+
+
+
+.dashboard-box p{
+    font-size:18px;
+    color:#64748b;
+    margin-bottom:10px;
+}
+
+.dashboard-box h2{
+    font-size:30px;
+    color:#ef4444;
+}
+.recent-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
+}
+
+.mini-btn{
+background:#3b82f6;
+color:#fff;
+padding:8px 15px;
+border-radius:8px;
+text-decoration:none;
+font-size:13px;
+font-weight:600;
+}
+
+.mini-btn:hover{
+background:#2563eb;
+}
+.rate-date{
+margin-top:8px;
+font-size:11px;
+opacity:.75;
+}
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.header-actions{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.notification{
+    position:relative;
+}
+
+#bellBtn{
+    font-size:22px;
+    cursor:pointer;
+    color:#374151;
+    transition:.2s;
+}
+
+#bellBtn:hover{
+    color:#2563EB;
+}
+
+.notification-box{
+    position:absolute;
+    top:45px;
+    right:0;
+    width:330px;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+    border:1px solid #E5E7EB;
+    padding:18px;
+    display:none;
+    z-index:9999;
+}
+
+.notification-box h4{
+    margin:0 0 15px;
+    font-size:18px;
+}
+
+.notification-box p{
+    margin:10px 0;
+    padding-bottom:10px;
+    border-bottom:1px solid #eee;
+    font-size:14px;
+}
+
+.notification-box p:last-child{
+    border-bottom:none;
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 session_start();
 
 if(!isset($_SESSION["id"])){
@@ -12,7 +11,9 @@ if(!isset($_SESSION["id"])){
 
 require_once "config/database.php";
 
-$userName=$_SESSION["first_name"];
+$user_id = $_SESSION["id"];
+$userName = $_SESSION["first_name"];
+
 
 /* Toplam Gelir */
 
@@ -22,8 +23,9 @@ FROM incomes
 WHERE user_id=?
 ");
 
-$stmt->execute([$_SESSION["id"]]);
+$stmt->execute([$user_id]);
 $totalIncome = $stmt->fetch()["total"];
+
 
 /* Toplam Gider */
 
@@ -33,18 +35,16 @@ FROM expenses
 WHERE user_id=?
 ");
 
-$stmt->execute([$_SESSION["id"]]);
+$stmt->execute([$user_id]);
 $totalExpense = $stmt->fetch()["total"];
 
-$stmt->execute([$_SESSION["id"]]);
-$totalExpense = $stmt->fetch()["total"];
 
-/* Güncel Bakiye */
 /* Bakiye */
+
 $balance = $totalIncome - $totalExpense;
 
-/* Son işlemler */
-$transactions = [];
+
+/* Son İşlemler */
 
 $stmt = $pdo->prepare("
 SELECT title,amount,income_date AS tdate,'Gelir' AS type
@@ -62,31 +62,96 @@ LIMIT 5
 ");
 
 $stmt->execute([
-    $_SESSION["id"],
-    $_SESSION["id"]
+    $user_id,
+    $user_id
 ]);
 
 $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-/* Güncel kur (şimdilik sabit) */
-$usdRate = 40.20;
-$eurRate = 47.10;
+/* Güncel Döviz Kuru */
 
-/* Gelir */
-$incomeUSD = $totalIncome / $usdRate;
-$incomeEUR = $totalIncome / $eurRate;
+$currencyData = file_get_contents(
+"https://api.frankfurter.app/latest?from=TRY&to=USD,EUR"
+);
 
-/* Gider */
-$expenseUSD = $totalExpense / $usdRate;
-$expenseEUR = $totalExpense / $eurRate;
+$currency = json_decode($currencyData,true);
 
-/* Bakiye */
-$balanceUSD = $balance / $usdRate;
-$balanceEUR = $balance / $eurRate;
+$usdRate = $currency["rates"]["USD"];
+$eurRate = $currency["rates"]["EUR"];
+
+
+/* TL -> USD / EUR */
+
+$incomeUSD = $totalIncome * $usdRate;
+$incomeEUR = $totalIncome * $eurRate;
+
+$expenseUSD = $totalExpense * $usdRate;
+$expenseEUR = $totalExpense * $eurRate;
+
+$balanceUSD = $balance * $usdRate;
+$balanceEUR = $balance * $eurRate;
+
+$rateDate = $currency["date"];
+/* Bu Ay Gelir */
+
+$stmt = $pdo->prepare("
+SELECT IFNULL(SUM(amount),0)
+FROM incomes
+WHERE user_id=?
+AND MONTH(income_date)=MONTH(CURDATE())
+AND YEAR(income_date)=YEAR(CURDATE())
+");
+
+$stmt->execute([$user_id]);
+$thisMonthIncome = $stmt->fetchColumn();
+
+
+/* Bu Ay Gider */
+
+$stmt = $pdo->prepare("
+SELECT IFNULL(SUM(amount),0)
+FROM expenses
+WHERE user_id=?
+AND MONTH(expense_date)=MONTH(CURDATE())
+AND YEAR(expense_date)=YEAR(CURDATE())
+");
+
+$stmt->execute([$user_id]);
+$thisMonthExpense = $stmt->fetchColumn();
+
+$thisMonthBalance = $thisMonthIncome - $thisMonthExpense;
+
+
+/* En Çok Harcanan Kategori */
+
+$stmt = $pdo->prepare("
+SELECT
+category,
+SUM(amount) AS total
+FROM expenses
+WHERE user_id=?
+GROUP BY category
+ORDER BY total DESC
+LIMIT 1
+");
+
+$stmt->execute([$user_id]);
+
+$topCategory = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("
+SELECT COUNT(*)
+FROM goals
+WHERE user_id=?
+");
+
+$stmt->execute([$user_id]);
+
+$goalCount = $stmt->fetchColumn();
+
+
 ?>
-
-
 <!DOCTYPE html>
 <html lang="tr">
 
@@ -122,50 +187,158 @@ Hoş Geldin,
 
 </h2>
 
+<a href="profil.php" class="btn-profile">
+    <?= htmlspecialchars($userName) ?>
+</a>
+
 
 
 </header>
 
 <div class="cards">
 
+    <!-- Gelir -->
     <div class="card income">
-        <p>Toplam Gelir</p>
-        <h2>₺<?= number_format($totalIncome,2,",",".") ?></h2>
 
-        <span class="card-info">
+        <div class="card-rotate" onclick="nextCurrency()">
+            <i class="fa-solid fa-rotate"></i>
+        </div>
+
+        <p>Toplam Gelir</p>
+
+        <h2 id="incomeValue">
+            ₺<?= number_format($totalIncome,2,",",".") ?>
+        </h2>
+
+        <span class="card-info" id="incomeInfo">
             ≈ $<?= number_format($incomeUSD,2,",",".") ?>
             |
             ≈ €<?= number_format($incomeEUR,2,",",".") ?>
         </span>
+
     </div>
 
+    <!-- Gider -->
     <div class="card expense">
-        <p>Toplam Gider</p>
-        <h2>₺<?= number_format($totalExpense,2,",",".") ?></h2>
 
-        <span class="card-info">
+        <div class="card-rotate" onclick="nextCurrency()">
+            <i class="fa-solid fa-rotate"></i>
+        </div>
+
+        <p>Toplam Gider</p>
+
+        <h2 id="expenseValue">
+            ₺<?= number_format($totalExpense,2,",",".") ?>
+        </h2>
+
+        <span class="card-info" id="expenseInfo">
             ≈ $<?= number_format($expenseUSD,2,",",".") ?>
             |
             ≈ €<?= number_format($expenseEUR,2,",",".") ?>
         </span>
+
     </div>
 
+    <!-- Bakiye -->
     <div class="card balance">
-        <p>Güncel Bakiye</p>
-        <h2>₺<?= number_format($balance,2,",",".") ?></h2>
 
-        <span class="card-info">
+        <div class="card-rotate" onclick="nextCurrency()">
+            <i class="fa-solid fa-rotate"></i>
+        </div>
+
+        <p>Güncel Bakiye</p>
+
+        <h2 id="balanceValue">
+            ₺<?= number_format($balance,2,",",".") ?>
+        </h2>
+
+        <span class="card-info" id="balanceInfo">
             ≈ $<?= number_format($balanceUSD,2,",",".") ?>
             |
             ≈ €<?= number_format($balanceEUR,2,",",".") ?>
         </span>
+
     </div>
 
 </div>
+<p class="rate-date">
+Kur Tarihi:
+<?= date("d.m.Y",strtotime($rateDate)) ?>
+</p>
+<div class="dashboard-box">
+
+<h3>
+<i class="fa-solid fa-calendar-days"></i>
+Bu Ay Özeti
+</h3>
+
+<div class="summary-grid">
+
+<div>
+<span>Gelir</span>
+<h2>₺<?= number_format($thisMonthIncome,2,",",".") ?></h2>
+</div>
+
+<div>
+<span>Gider</span>
+<h2>₺<?= number_format($thisMonthExpense,2,",",".") ?></h2>
+</div>
+
+<div>
+<span>Tasarruf</span>
+<h2>₺<?= number_format($thisMonthBalance,2,",",".") ?></h2>
+</div>
+</div>
+
+<div class="dashboard-box">
+
+<h3>
+<i class="fa-solid fa-bullseye"></i>
+Tasarruf Hedefleri
+</h3>
+
+<h2><?= $goalCount ?></h2>
+
+<p>Aktif hedef bulunuyor.</p>
+
+</div>
+</div>
+<div class="dashboard-box">
+
+<h3>
+<i class="fa-solid fa-fire"></i>
+En Çok Harcanan
+</h3>
+
+<?php if($topCategory){ ?>
+
+<p><?= htmlspecialchars($topCategory["category"]) ?></p>
+
+<h2>
+₺<?= number_format($topCategory["total"],2,",",".") ?>
+</h2>
+
+<?php }else{ ?>
+
+<p>Henüz harcama bulunmuyor.</p>
+
+<?php } ?>
+
+</div>
+<br>
 
 <div class="recent">
 
-<h3> Son İşlemler</h3>
+<div class="recent-header">
+
+<h3>Son İşlemler</h3>
+
+<a href="reports.php" class="mini-btn">
+Tümünü Gör
+</a>
+
+</div>
+<br>
 <table>
     <tr>
         <th>Tür</th>
@@ -173,7 +346,7 @@ Hoş Geldin,
         <th>Tarih</th>
         <th>Tutar</th>
 </tr>
-<td>
+
 <?php if(Count($transactions)>0):?>
     <?php foreach($transactions as $item): ?>
         <tr>
@@ -200,7 +373,7 @@ Hoş Geldin,
     <?php if($item["type"] == "Gelir"){ ?>
 
         <span class="status-income">
-             ₺ <?= number_format($item["amount"], 2, ",", ".") ?>
+             + ₺ <?= number_format($item["amount"], 2, ",", ".") ?>
         </span>
 
     <?php } else { ?>
@@ -216,16 +389,97 @@ Hoş Geldin,
     <?php endforeach; ?>
     <?php else:?>
         <tr>
-            <td colspan="4" style="text_align:center">
+            <td colspan="4" style="text-align:center">
 
-    Heniz işlem bulunmuyor
+    Henüz işlem bulunmuyor
     </td>
         </tr>
-    </span>
     <?php endif ;?>
     </table>
 
 </div>
+
+<script>
+let currency = "TRY";
+
+const values = {
+    income: {
+        TRY: <?= $totalIncome ?>,
+        USD: <?= $incomeUSD ?>,
+        EUR: <?= $incomeEUR ?>
+    },
+    expense: {
+        TRY: <?= $totalExpense ?>,
+        USD: <?= $expenseUSD ?>,
+        EUR: <?= $expenseEUR ?>
+    },
+    balance: {
+        TRY: <?= $balance ?>,
+        USD: <?= $balanceUSD ?>,
+        EUR: <?= $balanceEUR ?>
+    }
+};
+
+function formatMoney(value){
+    return Number(value).toLocaleString("tr-TR",{
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+    });
+}
+
+function nextCurrency(){
+
+    if(currency=="TRY"){
+        currency="USD";
+    }else if(currency=="USD"){
+        currency="EUR";
+    }else{
+        currency="TRY";
+    }
+
+    const symbol={
+        TRY:"₺",
+        USD:"$",
+        EUR:"€"
+    };
+
+    document.getElementById("incomeValue").innerHTML =
+        symbol[currency]+formatMoney(values.income[currency]);
+
+    document.getElementById("expenseValue").innerHTML =
+        symbol[currency]+formatMoney(values.expense[currency]);
+
+    document.getElementById("balanceValue").innerHTML =
+        symbol[currency]+formatMoney(values.balance[currency]);
+
+    updateSmallText();
+}
+
+function updateSmallText(){
+
+    const list=["TRY","USD","EUR"];
+
+    let other=list.filter(x=>x!=currency);
+
+    const s={
+        TRY:"₺",
+        USD:"$",
+        EUR:"€"
+    };
+
+    document.getElementById("incomeInfo").innerHTML=
+        "≈ "+s[other[0]]+formatMoney(values.income[other[0]])+
+        " | ≈ "+s[other[1]]+formatMoney(values.income[other[1]]);
+
+    document.getElementById("expenseInfo").innerHTML=
+        "≈ "+s[other[0]]+formatMoney(values.expense[other[0]])+
+        " | ≈ "+s[other[1]]+formatMoney(values.expense[other[1]]);
+
+    document.getElementById("balanceInfo").innerHTML=
+        "≈ "+s[other[0]]+formatMoney(values.balance[other[0]])+
+        " | ≈ "+s[other[1]]+formatMoney(values.balance[other[1]]);
+}
+</script>
 
 </body>
 
