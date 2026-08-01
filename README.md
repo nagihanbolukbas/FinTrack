@@ -1,0 +1,181 @@
+# 💰 FinTrack
+
+FinTrack, kullanıcıların kişisel finanslarını kolay, güvenli ve verimli bir şekilde yönetebilmeleri amacıyla geliştirilen web tabanlı bir Kişisel Finans Yönetim Sistemidir.
+
+Bu proje, İstanbul Gelişim Üniversitesi Web Tasarımı ve Kodlama Programı kapsamında gerçekleştirilen zorunlu yaz stajı sürecinde **CRS Soft** bünyesinde geliştirilmiştir.
+
+---
+
+## 🚀 Proje Amacı
+
+FinTrack ile kullanıcıların;
+
+- Gelir ve giderlerini kayıt altına alması,
+- Finansal durumunu anlık olarak takip etmesi,
+- Tasarruf hedefleri oluşturması ve ilerleme durumunu görüntülemesi,
+- Grafikler aracılığıyla finansal verilerini analiz etmesi,
+- Finansal hareketlerini PDF raporu olarak dışa aktarması,
+- Güncel döviz kurları üzerinden finansal değerlerini farklı para birimlerinde görüntüleyebilmesi
+
+amaçlanmıştır.
+
+---
+
+## ✨ Özellikler
+
+- 🔐 Kullanıcı kayıt ve güvenli giriş sistemi
+- 👤 Güvenli oturum (Session) yönetimi
+- 📊 Dashboard (Genel finans özeti)
+- 💰 Gelir yönetimi (Ekle / Düzenle / Sil)
+- 💸 Gider yönetimi (Ekle / Düzenle / Sil)
+- 🏷️ Kategori yönetimi
+- 🎯 Tasarruf hedefleri oluşturma ve takip etme
+- 💵 Gelirlerden doğrudan tasarruf hedefine para aktarma
+- 👤 Profil yönetimi
+- 📈 Chart.js ile gelir-gider analiz grafikleri
+- 📄 PDF finansal raporlama
+- 💱 Güncel döviz kuru entegrasyonu
+- 📅 Aylık finansal özet
+- 📋 Son işlemler görüntüleme
+
+---
+## 🏗️ Kullanılan Mimari
+
+FinTrack projesinde kod düzenini, okunabilirliği ve sürdürülebilirliği artırmak amacıyla **MVC (Model - View - Controller)** mimarisi kullanılmıştır.
+
+MVC yapısı sayesinde;
+
+- **Model** katmanında veritabanı işlemleri ve veri yönetimi,
+- **View** katmanında kullanıcı arayüzleri,
+- **Controller** katmanında ise uygulama akışı ve iş mantığı
+
+birbirinden ayrılarak daha düzenli ve yönetilebilir bir proje yapısı oluşturulmuştur.
+
+## 🛠️ Kullanılan Teknolojiler
+
+- PHP
+- MySQL
+- HTML5
+- CSS3
+- JavaScript
+- PDO
+- Chart.js
+- FPDF
+- Font Awesome
+- XAMPP
+- MVC Architecture
+- Object Oriented Programming (OOP)
+
+---
+## 🏗️ MVC Mimari Yapısı
+
+FinTrack projesinde kod okunabilirliğini ve sürdürülebilirliği artırmak amacıyla MVC (Model-View-Controller) mimarisi kullanılmıştır.
+
+- **Model:** Veritabanı işlemleri ve veri yönetimi
+- **View:** Kullanıcı arayüzlerinin yönetimi
+- **Controller:** Kullanıcı istekleri, iş mantığı ve uygulama akışının yönetimi
+
+Bu yapı sayesinde uygulama katmanları birbirinden ayrılarak daha düzenli ve geliştirilebilir bir mimari oluşturulmuştur.
+
+---
+## 📂 Proje Yapısı
+
+```text
+FinTrack/
+│
+├── app/
+│   │
+│   ├── controllers/
+│   │   ├── AuthController.php
+│   │   ├── DashboardController.php
+│   │   ├── IncomeController.php
+│   │   ├── ExpenseController.php
+│   │   ├── GoalController.php
+│   │   ├── ProfileController.php
+│   │   └── ReportController.php
+│   │
+│   ├── models/
+│   │   ├── User.php
+│   │   ├── Income.php
+│   │   ├── Expense.php
+│   │   ├── Category.php
+│   │   └── Goal.php
+│   │
+│   └── views/
+│       ├── auth/
+│       ├── dashboard/
+│       ├── incomes/
+│       ├── expenses/
+│       ├── goals/
+│       ├── profil/
+│       ├── reports/
+│       └── settings/
+│
+├── assets/
+│   └── css/
+│       ├── style.css
+│       └── dashboard.css
+│
+├── config/
+│   └── database.php
+│
+├── database/
+│   └── fintrack.sql
+│
+├── fpdf/
+│
+├── includes/
+│
+├── PHPMailer/
+│
+├── cache/
+│   └── exchange.json
+│
+├── index.php
+├── login.php
+├── register.php
+├── logout.php
+└── README.md
+```
+---
+
+## 📸 Modüller
+
+- Dashboard
+- Gelir Yönetimi
+- Gider Yönetimi
+- Tasarruf Hedefleri
+- Profil Yönetimi
+- Grafik ve Analiz
+- Finansal Raporlama
+
+---
+
+## ⚙️ Kurulum
+
+1. Projeyi bilgisayarınıza indirin.
+2. XAMPP içerisindeki **htdocs** klasörüne kopyalayın.
+3. MySQL üzerinde **FinTrack** veritabanını oluşturun.
+4. SQL dosyasını phpMyAdmin üzerinden içe aktarın.
+5. `config/database.php` dosyasındaki veritabanı bağlantı bilgilerini düzenleyin.
+6. Apache ve MySQL servislerini çalıştırın.
+7. Tarayıcıdan aşağıdaki adresi açın.
+
+```text
+http://localhost/FinTrack
+```
+
+---
+
+## 👩‍💻 Geliştirici
+
+**Nagihan Bölükbaş**
+
+İstanbul Gelişim Üniversitesi  
+Web Tasarımı ve Kodlama
+
+---
+
+## 📄 Lisans
+
+Bu proje, eğitim ve zorunlu yaz stajı kapsamında geliştirilmiş olup ticari kullanım amacı taşımamaktadır.

@@ -252,7 +252,39 @@
     </div>
 
 </section>
+<footer class="footer">
 
+    <div class="container footer-container">
+
+        <div class="footer-logo">
+
+            <h2><span>Fin</span>Track</h2>
+
+            <p>
+                Kişisel finans yönetimini kolaylaştıran modern bütçe takip platformu.
+            </p>
+
+        </div>
+
+
+        <div class="footer-contact">
+
+            <h4>İletişim</h4>
+
+            <p>📧 fintrackproject101@gmail.com</p>
+            <p>🌍 Türkiye</p>
+
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+
+        © <?= date("Y") ?> FinTrack | Tüm Hakları Saklıdır.
+
+    </div>
+
+</footer>
 </body>
 
 </html>
