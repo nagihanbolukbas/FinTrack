@@ -65,22 +65,22 @@ class DashboardController
         /* Döviz */
 
         require_once "app/helpers/CurrencyHelper.php";
+// Sabit kur değerleri
+$usdRate = 48; // 1 USD = 48 TL
+$eurRate = 54; // 1 EUR = 54 TL
 
-$currency = CurrencyHelper::getRates();
+// TL -> USD / EUR dönüşümü
+$incomeUSD = $totalIncome / $usdRate;
+$incomeEUR = $totalIncome / $eurRate;
 
-        $usdRate = $currency["rates"]["USD"];
-        $eurRate = $currency["rates"]["EUR"];
+$expenseUSD = $totalExpense / $usdRate;
+$expenseEUR = $totalExpense / $eurRate;
 
-        $incomeUSD = $totalIncome * $usdRate;
-        $incomeEUR = $totalIncome * $eurRate;
+$balanceUSD = $balance / $usdRate;
+$balanceEUR = $balance / $eurRate;
 
-        $expenseUSD = $totalExpense * $usdRate;
-        $expenseEUR = $totalExpense * $eurRate;
-
-        $balanceUSD = $balance * $usdRate;
-        $balanceEUR = $balance * $eurRate;
-
-        $rateDate = $currency["date"];
+// Bilgi amaçlı tarih
+$rateDate = date("d.m.Y");
 
         $notifications = [];
                 // Negatif bakiye

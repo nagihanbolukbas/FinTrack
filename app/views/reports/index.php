@@ -279,7 +279,7 @@ new Chart(document.getElementById("incomeChart"),{
                 "#DCFCE7"
             ],
 
-            borderWidth:0
+            borderWidth:0.5
 
         }]
 
@@ -339,7 +339,7 @@ new Chart(document.getElementById("expenseChart"),{
     "#E65100"
 ],
 
-            borderWidth:0
+            borderWidth:0.5
 
         }]
 
